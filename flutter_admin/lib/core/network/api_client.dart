@@ -1,14 +1,9 @@
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
-import '../utils/app_constants.dart';
-
 class ApiClient {
   ApiClient({String? baseUrl})
-      : baseUrl = baseUrl ??
-            dotenv.env['BASE_URL'] ??
-            dotenv.env['API_BASE'] ??
-            AppConstants.defaultBaseUrl;
+    : baseUrl = baseUrl ?? dotenv.env['BASE_URL'] ?? '';
 
   final String baseUrl;
   String? token;
@@ -26,7 +21,11 @@ class ApiClient {
   }
 
   Future<http.Response> post(String path, {Object? body, bool auth = true}) {
-    return http.post(uri(path), headers: headers(auth: auth), body: body);
+    return http.post(
+      uri(path),
+      headers: headers(auth: auth),
+      body: body,
+    );
   }
 
   Future<http.Response> get(String path, {Map<String, String>? query}) {

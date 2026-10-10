@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'core/network/api_client.dart';
-import 'core/utils/app_constants.dart';
 import 'features/auth/viewmodels/login_viewmodel.dart';
 import 'routes/app_router.dart';
 import 'routes/app_routes.dart';
@@ -20,7 +19,7 @@ class TaskAdminApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => LoginViewModel(api)),
       ],
       child: MaterialApp(
-        title: AppConstants.appName,
+        title: "Booking Admin",
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),

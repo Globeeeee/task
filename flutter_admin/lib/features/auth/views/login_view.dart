@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../../core/utils/app_constants.dart';
 import '../../../routes/app_router.dart';
 import '../viewmodels/login_viewmodel.dart';
 
@@ -13,8 +12,8 @@ class LoginView extends StatefulWidget {
 }
 
 class _LoginViewState extends State<LoginView> {
-  final emailCtrl = TextEditingController(text: 'admin@gmail.com');
-  final passCtrl = TextEditingController(text: 'Admin@123');
+  final emailCtrl = TextEditingController();
+  final passCtrl = TextEditingController();
 
   @override
   void dispose() {
@@ -43,7 +42,7 @@ class _LoginViewState extends State<LoginView> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const Text(
-                AppConstants.appName,
+                "Booking Admin",
                 style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: 20),
