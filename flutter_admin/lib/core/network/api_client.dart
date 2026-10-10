@@ -29,5 +29,9 @@ class ApiClient {
     return http.patch(_url(path), headers: _headers(), body: body);
   }
 
+  Future<http.Response> delete(String path) {
+    return http.delete(_url(path), headers: _headers());
+  }
+
   void clearToken() => token = null;
 }

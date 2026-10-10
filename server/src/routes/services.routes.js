@@ -1,14 +1,50 @@
 import express from 'express';
+import authMiddleware from '../middleware/auth.middleware.js';
+import adminMiddleware from '../middleware/admin.middleware.js';
 import ServicesService from '../services/services.services.js';
 
 const router = express.Router();
+const admin = [authMiddleware, adminMiddleware];
 
-router.get('/', async (req, res) => {
+router.get('/', async (_req, res) => {
   try {
     const services = await ServicesService.listServices();
     res.json({ success: true, data: services });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message || 'failed' });
+  }
+});
+
+router.post('/', ...admin, async (req, res) => {
+  const name = (req.body?.name || '').trim();
+  if (!name) return res.status(400).json({ success: false, message: 'name required' });
+  try {
+    const created = await ServicesService.addService({ name });
+    res.status(201).json({ success: true, data: created });
+  } catch (e) {
+    res.status(500).json({ success: false, message: e.message });
+  }
+});
+
+router.patch('/:id', ...admin, async (req, res) => {
+  const name = (req.body?.name || '').trim();
+  if (!name) return res.status(400).json({ success: false, message: 'name required' });
+  try {
+    const updated = await ServicesService.updateService(req.params.id, { name });
+    if (!updated) return res.status(404).json({ success: false, message: 'not found' });
+    res.json({ success: true, data: updated });
+  } catch (e) {
+    res.status(500).json({ success: false, message: e.message });
+  }
+});
+
+router.delete('/:id', ...admin, async (req, res) => {
+  try {
+    const ok = await ServicesService.deleteService(req.params.id);
+    if (!ok) return res.status(404).json({ success: false, message: 'not found' });
+    res.json({ success: true, message: 'deleted' });
+  } catch (e) {
+    res.status(500).json({ success: false, message: e.message });
   }
 });
 

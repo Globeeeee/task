@@ -8,11 +8,13 @@ class BookingTile extends StatelessWidget {
     required this.booking,
     this.onConfirm,
     this.onCancel,
+    this.onDelete,
   });
 
   final Booking booking;
   final VoidCallback? onConfirm;
   final VoidCallback? onCancel;
+  final VoidCallback? onDelete;
 
   @override
   Widget build(BuildContext context) {
@@ -33,22 +35,28 @@ class BookingTile extends StatelessWidget {
           style: TextStyle(fontSize: 13.sp, height: 1.35),
         ),
         isThreeLine: true,
-        trailing: !b.pending
-            ? null
-            : Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  FilledButton(
-                    onPressed: onConfirm,
-                    child: const Text('Confirm'),
-                  ),
-                  SizedBox(width: 8.w),
-                  OutlinedButton(
-                    onPressed: onCancel,
-                    child: const Text('Cancel'),
-                  ),
-                ],
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (b.pending) ...[
+              FilledButton(
+                onPressed: onConfirm,
+                child: const Text('Confirm'),
               ),
+              SizedBox(width: 8.w),
+              OutlinedButton(
+                onPressed: onCancel,
+                child: const Text('Cancel'),
+              ),
+              SizedBox(width: 8.w),
+            ],
+            IconButton(
+              onPressed: onDelete,
+              icon: const Icon(Icons.delete_outline),
+              tooltip: 'Delete',
+            ),
+          ],
+        ),
       ),
     );
   }
