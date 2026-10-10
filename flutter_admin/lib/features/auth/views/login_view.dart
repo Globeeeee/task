@@ -26,7 +26,7 @@ class _LoginViewState extends State<LoginView> {
     final vm = context.read<LoginViewModel>();
     final ok = await vm.login(emailCtrl.text, passCtrl.text);
     if (!ok || !mounted) return;
-    AppRouter.goToBookings(context);
+    Navigator.pushReplacementNamed(context, AppRoutes.bookings);
   }
 
   @override

@@ -33,7 +33,7 @@ class BookingsView extends StatelessWidget {
           TextButton(
             onPressed: () {
               vm.logout();
-              AppRouter.goToLogin(context);
+              Navigator.pushReplacementNamed(context, AppRoutes.login);
             },
             child: const Text('Logout'),
           ),
