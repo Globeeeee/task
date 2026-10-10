@@ -15,16 +15,14 @@ class Booking {
   final String slotStart;
   final String status;
 
-  bool get isPending => status == 'pending';
+  bool get pending => status == 'pending';
 
-  factory Booking.fromJson(Map<String, dynamic> json) {
-    return Booking(
-      id: json['id']?.toString() ?? '',
-      customerName: json['customerName']?.toString() ?? '',
-      serviceName: json['serviceName']?.toString() ?? '',
-      stylistName: json['stylistName']?.toString() ?? '',
-      slotStart: json['slotStart']?.toString() ?? '',
-      status: json['status']?.toString() ?? '',
-    );
-  }
+  factory Booking.fromJson(Map<String, dynamic> j) => Booking(
+        id: j['id']?.toString() ?? '',
+        customerName: j['customerName']?.toString() ?? '',
+        serviceName: j['serviceName']?.toString() ?? '',
+        stylistName: j['stylistName']?.toString() ?? '',
+        slotStart: j['slotStart']?.toString() ?? '',
+        status: j['status']?.toString() ?? '',
+      );
 }

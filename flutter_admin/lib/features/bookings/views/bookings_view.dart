@@ -1,116 +1,173 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
-
+import '../../../core/network/api_client.dart';
+import '../../../core/utils/error_message.dart';
+import '../../../core/widgets/error_text.dart';
+import '../../../core/widgets/page_body.dart';
 import '../../../routes/app_router.dart';
-import '../viewmodels/bookings_viewmodel.dart';
+import '../../auth/services/auth_service.dart';
+import '../models/booking.dart';
+import '../services/booking_service.dart';
+import '../widgets/booking_tile.dart';
 
-class BookingsView extends StatelessWidget {
+class BookingsView extends StatefulWidget {
   const BookingsView({super.key});
 
-  Future<void> _status(BuildContext context, String id, String status) async {
-    final vm = context.read<BookingsViewModel>();
-    await vm.changeStatus(id, status);
-    if (!context.mounted) return;
-    if (vm.actionError != null) {
+  @override
+  State<BookingsView> createState() => _BookingsViewState();
+}
+
+class _BookingsViewState extends State<BookingsView> {
+  List<Booking> items = [];
+  String filter = 'all';
+  bool loading = false;
+  String? err;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => load());
+  }
+
+  Future<void> load() async {
+    final api = context.read<ApiClient>();
+    if (api.token == null || api.token!.isEmpty) {
+      if (!mounted) return;
+      Navigator.pushReplacementNamed(context, Routes.login);
+      return;
+    }
+
+    setState(() {
+      loading = true;
+      err = null;
+    });
+
+    try {
+      final status = filter == 'all' ? null : filter;
+      final list = await context.read<BookingService>().list(status: status);
+      if (!mounted) return;
+      setState(() {
+        items = list;
+        loading = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      final msg = cleanErr(e);
+      if (msg.contains('token') || msg.contains('unauthorized')) {
+        Navigator.pushReplacementNamed(context, Routes.login);
+        return;
+      }
+      setState(() {
+        err = msg;
+        loading = false;
+      });
+    }
+  }
+
+  Future<void> changeStatus(String id, String status) async {
+    try {
+      await context.read<BookingService>().setStatus(id, status);
+      await load();
+    } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(vm.actionError!)),
+        SnackBar(content: Text(cleanErr(e))),
       );
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final vm = context.watch<BookingsViewModel>();
-
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Bookings'),
+        title: Text('Admin Panel', style: TextStyle(fontSize: 20.sp)),
         actions: [
           IconButton(
-            onPressed: vm.isLoading ? null : vm.load,
+            onPressed: loading ? null : load,
             icon: const Icon(Icons.refresh),
           ),
           TextButton(
             onPressed: () {
-              vm.logout();
-              Navigator.pushReplacementNamed(context, AppRoutes.login);
+              context.read<AuthService>().logout();
+              Navigator.pushReplacementNamed(context, Routes.login);
             },
             child: const Text('Logout'),
           ),
+          SizedBox(width: 12.w),
         ],
       ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
-            child: Row(
-              children: [
-                const Text('Filter: '),
-                const SizedBox(width: 8),
-                DropdownButton<String>(
-                  value: vm.filter,
-                  items: const [
-                    DropdownMenuItem(value: 'all', child: Text('All')),
-                    DropdownMenuItem(value: 'pending', child: Text('Pending')),
-                    DropdownMenuItem(value: 'confirmed', child: Text('Confirmed')),
-                    DropdownMenuItem(value: 'cancelled', child: Text('Cancelled')),
-                  ],
-                  onChanged: (v) {
-                    if (v != null) vm.setFilter(v);
-                  },
-                ),
-              ],
-            ),
-          ),
-          if (vm.isLoading) const LinearProgressIndicator(),
-          if (vm.error != null)
+      body: PageBody(
+        child: Column(
+          children: [
             Padding(
-              padding: const EdgeInsets.all(16),
-              child: Text(vm.error!, style: const TextStyle(color: Colors.red)),
-            ),
-          Expanded(
-            child: vm.bookings.isEmpty && !vm.isLoading
-                ? const Center(child: Text('No bookings'))
-                : ListView.builder(
-                    itemCount: vm.bookings.length,
-                    itemBuilder: (context, i) {
-                      final b = vm.bookings[i];
-                      return Card(
-                        margin: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 6,
-                        ),
-                        child: ListTile(
-                          title: Text('${b.customerName} — ${b.serviceName}'),
-                          subtitle: Text(
-                            'Stylist: ${b.stylistName}\n'
-                            'Time: ${b.slotStart}\n'
-                            'Status: ${b.status}',
-                          ),
-                          isThreeLine: true,
-                          trailing: b.isPending
-                              ? Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    TextButton(
-                                      onPressed: () =>
-                                          _status(context, b.id, 'confirmed'),
-                                      child: const Text('Confirm'),
-                                    ),
-                                    TextButton(
-                                      onPressed: () =>
-                                          _status(context, b.id, 'cancelled'),
-                                      child: const Text('Cancel'),
-                                    ),
-                                  ],
-                                )
-                              : null,
-                        ),
-                      );
-                    },
+              padding: EdgeInsets.fromLTRB(24.w, 16.h, 24.w, 8.h),
+              child: Row(
+                children: [
+                  Text(
+                    'Bookings',
+                    style: TextStyle(
+                      fontSize: 18.sp,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
-          ),
-        ],
+                  const Spacer(),
+                  Text('Filter', style: TextStyle(fontSize: 14.sp)),
+                  SizedBox(width: 10.w),
+                  DropdownButton<String>(
+                    value: filter,
+                    items: const [
+                      DropdownMenuItem(value: 'all', child: Text('All')),
+                      DropdownMenuItem(value: 'pending', child: Text('Pending')),
+                      DropdownMenuItem(
+                        value: 'confirmed',
+                        child: Text('Confirmed'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'cancelled',
+                        child: Text('Cancelled'),
+                      ),
+                    ],
+                    onChanged: loading
+                        ? null
+                        : (v) {
+                            if (v == null) return;
+                            setState(() => filter = v);
+                            load();
+                          },
+                  ),
+                ],
+              ),
+            ),
+            if (loading) const LinearProgressIndicator(),
+            if (err != null)
+              Padding(
+                padding: EdgeInsets.all(16.w),
+                child: ErrorText(err!),
+              ),
+            Expanded(
+              child: items.isEmpty && !loading
+                  ? Center(
+                      child: Text(
+                        'nothing here',
+                        style: TextStyle(fontSize: 15.sp),
+                      ),
+                    )
+                  : ListView.builder(
+                      padding: EdgeInsets.fromLTRB(24.w, 4.h, 24.w, 24.h),
+                      itemCount: items.length,
+                      itemBuilder: (_, i) {
+                        final b = items[i];
+                        return BookingTile(
+                          booking: b,
+                          onConfirm: () => changeStatus(b.id, 'confirmed'),
+                          onCancel: () => changeStatus(b.id, 'cancelled'),
+                        );
+                      },
+                    ),
+            ),
+          ],
+        ),
       ),
     );
   }

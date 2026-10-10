@@ -1,0 +1,23 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+class PageBody extends StatelessWidget {
+  const PageBody({
+    super.key,
+    required this.child,
+    this.maxWidth = 1100,
+  });
+
+  final Widget child;
+  final double maxWidth;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(maxWidth: maxWidth.w),
+        child: child,
+      ),
+    );
+  }
+}

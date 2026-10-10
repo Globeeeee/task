@@ -92,6 +92,19 @@ async function changeStatus(bookingId, nextStatus, changedBy) {
   return { id: bookingId, ...current, status: nextStatus, updatedAt };
 }
 
+async function deleteBooking(bookingId) {
+  const bookingRef = bookingsCol().doc(bookingId);
+  const snap = await bookingRef.get();
+  if (!snap.exists) throw httpError('not found', 404);
+
+  const current = snap.data();
+  await bookingRef.delete();
+  if (current.slotKey) {
+    await locksCol().doc(current.slotKey).delete().catch(() => {});
+  }
+  return true;
+}
+
 async function clearBookings() {
   await wipeCollection('bookings');
   await wipeCollection('slot_locks');
@@ -103,5 +116,6 @@ export default {
   listBookings,
   placeBooking,
   changeStatus,
+  deleteBooking,
   clearBookings,
 };

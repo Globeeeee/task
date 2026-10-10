@@ -11,12 +11,10 @@ class AdminUser {
   final String role;
   final String token;
 
-  factory AdminUser.fromJson(Map<String, dynamic> json) {
-    return AdminUser(
-      email: json['email']?.toString() ?? '',
-      name: json['name']?.toString() ?? '',
-      role: json['role']?.toString() ?? '',
-      token: json['token']?.toString() ?? '',
-    );
-  }
+  factory AdminUser.fromJson(Map<String, dynamic> j) => AdminUser(
+        email: j['email']?.toString() ?? '',
+        name: j['name']?.toString() ?? '',
+        role: j['role']?.toString() ?? '',
+        token: j['token']?.toString() ?? '',
+      );
 }

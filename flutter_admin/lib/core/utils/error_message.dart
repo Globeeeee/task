@@ -1,3 +1,1 @@
-String errorMessage(Object e) {
-  return e.toString().replaceFirst('Exception: ', '');
-}
+String cleanErr(Object e) => e.toString().replaceFirst('Exception: ', '');

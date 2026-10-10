@@ -18,6 +18,22 @@ const ServicesService = {
     return { id: ref.id, ...service };
   },
 
+  async updateService(id, data) {
+    const ref = db.collection('services').doc(id);
+    const snap = await ref.get();
+    if (!snap.exists) return null;
+    await ref.update(data);
+    return { id, ...snap.data(), ...data };
+  },
+
+  async deleteService(id) {
+    const ref = db.collection('services').doc(id);
+    const snap = await ref.get();
+    if (!snap.exists) return false;
+    await ref.delete();
+    return true;
+  },
+
   async clearServices() {
     const snap = await db.collection('services').get();
     if (snap.empty) return;

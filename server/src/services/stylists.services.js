@@ -18,6 +18,22 @@ export async function addStylist(data) {
   return { id: ref.id, ...data };
 }
 
+export async function updateStylist(id, data) {
+  const ref = db.collection('stylists').doc(id);
+  const snap = await ref.get();
+  if (!snap.exists) return null;
+  await ref.update(data);
+  return { id, ...snap.data(), ...data };
+}
+
+export async function deleteStylist(id) {
+  const ref = db.collection('stylists').doc(id);
+  const snap = await ref.get();
+  if (!snap.exists) return false;
+  await ref.delete();
+  return true;
+}
+
 export async function clearStylists() {
   const snap = await db.collection('stylists').get();
   if (snap.empty) return;
@@ -30,5 +46,7 @@ export default {
   listStylists,
   getStylistById,
   addStylist,
+  updateStylist,
+  deleteStylist,
   clearStylists,
 };

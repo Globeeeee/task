@@ -1,31 +1,27 @@
 import 'dart:convert';
-
 import '../../../core/network/api_client.dart';
 import '../models/admin_user.dart';
 
 class AuthService {
-  AuthService(this._client);
-
-  final ApiClient _client;
+  AuthService(this.api);
+  final ApiClient api;
 
   Future<AdminUser> login(String email, String password) async {
-    final res = await _client.post(
+    final res = await api.post(
       '/auth/login',
       auth: false,
       body: jsonEncode({'email': email, 'password': password}),
     );
 
-    final body = jsonDecode(res.body);
-    if (res.statusCode != 200 || body['success'] != true) {
-      throw Exception(body['message'] ?? 'login failed');
+    final data = jsonDecode(res.body);
+    if (res.statusCode != 200 || data['success'] != true) {
+      throw Exception(data['message'] ?? 'login failed');
     }
 
-    final user = AdminUser.fromJson(Map<String, dynamic>.from(body['data']));
-    _client.token = user.token;
+    final user = AdminUser.fromJson(Map<String, dynamic>.from(data['data']));
+    api.token = user.token;
     return user;
   }
 
-  void logout() {
-    _client.clearToken();
-  }
+  void logout() => api.clearToken();
 }
