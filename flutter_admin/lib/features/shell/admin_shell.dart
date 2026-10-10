@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import '../../core/network/api_client.dart';
 import '../../core/widgets/page_body.dart';
@@ -22,7 +21,6 @@ class _AdminShellState extends State<AdminShell> {
   @override
   void initState() {
     super.initState();
-    // kick back to login if no token
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       if (context.read<ApiClient>().token == null) {
@@ -41,7 +39,7 @@ class _AdminShellState extends State<AdminShell> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Admin', style: TextStyle(fontSize: 20.sp)),
+        title: const Text('Admin'),
         actions: [
           TextButton(
             onPressed: () {
@@ -50,7 +48,7 @@ class _AdminShellState extends State<AdminShell> {
             },
             child: const Text('log out'),
           ),
-          SizedBox(width: 8.w),
+          const SizedBox(width: 8),
         ],
       ),
       body: Row(

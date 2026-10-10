@@ -6,7 +6,6 @@ import '../../../core/widgets/error_text.dart';
 import '../models/item.dart';
 import '../widgets/item_tile.dart';
 
-// shared list for stylists + services (same ui basically)
 class ItemListPage extends StatefulWidget {
   const ItemListPage({
     super.key,

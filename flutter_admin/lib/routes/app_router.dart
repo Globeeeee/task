@@ -9,5 +9,7 @@ class Routes {
 
 final routes = <String, WidgetBuilder>{
   Routes.login: (_) => const LoginView(),
+  '/login': (_) => const LoginView(),
   Routes.home: (_) => const AdminShell(),
+  '/bookings': (_) => const AdminShell(),
 };

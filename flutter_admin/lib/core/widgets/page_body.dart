@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class PageBody extends StatelessWidget {
   const PageBody({super.key, required this.child, this.maxWidth = 1100});
@@ -11,7 +10,7 @@ class PageBody extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: ConstrainedBox(
-        constraints: BoxConstraints(maxWidth: maxWidth.w),
+        constraints: BoxConstraints(maxWidth: maxWidth),
         child: child,
       ),
     );

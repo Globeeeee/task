@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class AppButton extends StatelessWidget {
   const AppButton({
@@ -17,18 +16,32 @@ class AppButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final child = Text(loading ? '...' : label);
+    final child = loading
+        ? SizedBox(
+            width: 20,
+            height: 20,
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              color: outlined
+                  ? Theme.of(context).colorScheme.primary
+                  : Colors.white,
+            ),
+          )
+        : Text(label);
 
     if (outlined) {
-      return OutlinedButton(
-        onPressed: loading ? null : onPressed,
-        child: child,
+      return SizedBox(
+        height: 46,
+        child: OutlinedButton(
+          onPressed: loading ? null : onPressed,
+          child: child,
+        ),
       );
     }
 
     return SizedBox(
-      height: 44.h,
-      child: ElevatedButton(
+      height: 46,
+      child: FilledButton(
         onPressed: loading ? null : onPressed,
         child: child,
       ),

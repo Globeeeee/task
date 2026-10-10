@@ -36,10 +36,22 @@ class _AdminAppState extends State<AdminApp> {
       ],
       child: ScreenUtilInit(
         designSize: const Size(1440, 900),
-        builder: (_, child) => child!,
+        minTextAdapt: true,
+        builder: (context, child) {
+          return MediaQuery(
+            data: MediaQuery.of(context).copyWith(
+              textScaler: TextScaler.noScaling,
+            ),
+            child: child!,
+          );
+        },
         child: MaterialApp(
-          title: 'admin',
-          theme: ThemeData(primarySwatch: Colors.teal, useMaterial3: true),
+          title: 'Admin Panel',
+          debugShowCheckedModeBanner: false,
+          theme: ThemeData(
+            colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
+            useMaterial3: true,
+          ),
           initialRoute: Routes.login,
           routes: routes,
           onUnknownRoute: (_) =>
