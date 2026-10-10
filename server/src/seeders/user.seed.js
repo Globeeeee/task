@@ -1,11 +1,9 @@
-import dotenv from 'dotenv';
+import 'dotenv/config';
 import Firebase from '../../config/firebase.config.js';
 import UsersService from '../services/users.services.js';
 import BookingsService from '../services/bookings.services.js';
 import StylistsService from '../services/stylists.services.js';
 import ServicesService from '../services/services.services.js';
-
-dotenv.config();
 
 const { auth } = Firebase;
 

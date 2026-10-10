@@ -20,10 +20,28 @@ seed accounts:
 - admin@gmail.com / Admin@123 (admin)
 - q@gmail.com / qasim@123 (customer)
 
+add your firebase **Web API key** to `server/.env`:
+```
+FIREBASE_API_KEY=AIza...
+```
+(firebase console → project settings → general → web api key)
+
+### flutter admin
+
+```bash
+cd flutter_admin
+# base url is in flutter_admin/.env → API_BASE=http://localhost:5000/api
+flutter pub get
+flutter run -d chrome
+```
+
+login with admin@gmail.com / Admin@123
+
 ## endpoints
 
 all under `/api`, send `Authorization: Bearer <firebase id token>`
 
+- `POST /auth/login` — `{ email, password }` (admin only, returns token)
 - `GET /auth/me`
 - `GET /stylists`
 - `GET /services`
