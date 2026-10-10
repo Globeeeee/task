@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+
 import '../../../core/utils/error_message.dart';
 import '../../../core/widgets/app_text_field.dart';
 import '../../../core/widgets/error_text.dart';
@@ -62,22 +62,36 @@ class _ItemListPageState extends State<ItemListPage> {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
   }
 
-  Future<void> _save({Item? old}) async {
-    final con = TextEditingController(text: old?.name ?? '');
+  Future<bool> _ask(String title, {Widget? body}) async {
     final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(old == null ? 'Add' : 'Edit'),
-        content: AppTextField(controller: con, label: 'Name'),
+        title: Text(title),
+        content: body,
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
-          TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Save')),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('OK'),
+          ),
         ],
       ),
     );
+    return ok == true;
+  }
+
+  Future<void> _save({Item? old}) async {
+    final con = TextEditingController(text: old?.name ?? '');
+    final ok = await _ask(
+      old == null ? 'Add' : 'Edit',
+      body: AppTextField(controller: con, label: 'Name'),
+    );
     final name = con.text.trim();
     con.dispose();
-    if (ok != true || name.isEmpty || !mounted) return;
+    if (!ok || name.isEmpty || !mounted) return;
 
     try {
       if (old == null) {
@@ -92,17 +106,7 @@ class _ItemListPageState extends State<ItemListPage> {
   }
 
   Future<void> _remove(Item item) async {
-    final ok = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text('Delete ${item.name}?'),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('No')),
-          TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Yes')),
-        ],
-      ),
-    );
-    if (ok != true || !mounted) return;
+    if (!await _ask('Delete ${item.name}?') || !mounted) return;
     try {
       await widget.delete(item.id);
       await load();
@@ -116,24 +120,36 @@ class _ItemListPageState extends State<ItemListPage> {
     return Column(
       children: [
         Padding(
-          padding: EdgeInsets.fromLTRB(24.w, 16.h, 24.w, 8.h),
+          padding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
           child: Row(
             children: [
-              Text(widget.title, style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w600)),
+              Text(
+                widget.title,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
               const Spacer(),
-              IconButton(onPressed: loading ? null : load, icon: const Icon(Icons.refresh)),
-              ElevatedButton(onPressed: () => _save(), child: const Text('Add')),
+              IconButton(
+                onPressed: loading ? null : load,
+                icon: const Icon(Icons.refresh),
+              ),
+              ElevatedButton(
+                onPressed: () => _save(),
+                child: const Text('Add'),
+              ),
             ],
           ),
         ),
         if (loading) const LinearProgressIndicator(),
         if (error != null)
-          Padding(padding: EdgeInsets.all(16.w), child: ErrorText(error!)),
+          Padding(padding: const EdgeInsets.all(16), child: ErrorText(error!)),
         Expanded(
           child: items.isEmpty && !loading
-              ? Center(child: Text('empty', style: TextStyle(fontSize: 15.sp)))
+              ? const Center(child: Text('empty'))
               : ListView.builder(
-                  padding: EdgeInsets.fromLTRB(24.w, 4.h, 24.w, 24.h),
+                  padding: const EdgeInsets.fromLTRB(24, 4, 24, 24),
                   itemCount: items.length,
                   itemBuilder: (_, i) {
                     final item = items[i];

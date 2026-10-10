@@ -8,7 +8,7 @@ class ServicesApi {
   Future<List<Item>> list() async {
     final res = await api.get('/services');
     if (res.statusCode != 200) {
-      throw Exception(res.data['message'] ?? 'couldnt load services');
+      throw Exception(res.data['message'] ?? 'could not load services');
     }
     return (res.data['data'] as List)
         .map((e) => Item.fromJson(Map<String, dynamic>.from(e)))
