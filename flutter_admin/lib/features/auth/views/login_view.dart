@@ -39,7 +39,7 @@ class _LoginViewState extends State<LoginView> {
     try {
       await context.read<AuthService>().login(email.text.trim(), pass.text);
       if (!mounted) return;
-      Navigator.pushReplacementNamed(context, Routes.bookings);
+      Navigator.pushReplacementNamed(context, Routes.home);
     } catch (e) {
       if (!mounted) return;
       setState(() {
@@ -67,7 +67,7 @@ class _LoginViewState extends State<LoginView> {
               ),
               SizedBox(height: 6.h),
               Text(
-                'login to manage bookings',
+                'login to manage the panel',
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 14.sp, color: Colors.grey[700]),
               ),

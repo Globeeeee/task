@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../services/stylist_service.dart';
-import 'named_list_view.dart';
+import '../services/stylist_api.dart';
+import 'item_list_page.dart';
 
 class StylistsView extends StatelessWidget {
   const StylistsView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final api = context.read<StylistService>();
-    return NamedListView(
+    final api = context.read<StylistApi>();
+    return ItemListPage(
       title: 'Stylists',
-      load: api.list,
-      create: api.create,
-      update: api.update,
-      remove: api.remove,
+      getAll: api.list,
+      add: api.add,
+      edit: api.edit,
+      delete: api.delete,
     );
   }
 }

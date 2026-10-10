@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import '../features/auth/views/login_view.dart';
-import '../features/bookings/views/bookings_view.dart';
+import '../features/shell/admin_shell.dart';
 
 class Routes {
+  static const root = '/';
   static const login = '/login';
-  static const bookings = '/bookings';
+  static const home = '/home';
 }
 
 final routes = <String, WidgetBuilder>{
+  Routes.root: (_) => const LoginView(),
   Routes.login: (_) => const LoginView(),
-  Routes.bookings: (_) => const BookingsView(),
+  Routes.home: (_) => const AdminShell(),
+  '/bookings': (_) => const AdminShell(),
 };

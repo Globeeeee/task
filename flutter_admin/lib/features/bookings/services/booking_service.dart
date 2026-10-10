@@ -29,28 +29,6 @@ class BookingService {
         .toList();
   }
 
-  Future<Booking> create({
-    required String stylistId,
-    required String serviceId,
-    required String customerName,
-    required String slotStart,
-  }) async {
-    final res = await api.post(
-      '/admin/bookings',
-      body: jsonEncode({
-        'stylistId': stylistId,
-        'serviceId': serviceId,
-        'customerName': customerName,
-        'slotStart': slotStart,
-      }),
-    );
-    final data = jsonDecode(res.body);
-    if (res.statusCode != 201 && res.statusCode != 200) {
-      throw Exception(data['message'] ?? 'create failed');
-    }
-    return Booking.fromJson(Map<String, dynamic>.from(data['data']));
-  }
-
   Future<void> setStatus(String id, String status) async {
     final res = await api.patch(
       '/admin/bookings/$id/status',
