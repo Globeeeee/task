@@ -1,23 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import '../../core/network/api_client.dart';
 import '../../core/widgets/page_body.dart';
 import '../../routes/app_router.dart';
 import '../auth/services/auth_service.dart';
-import '../bookings/views/bookings_view.dart';
-import '../catalog/views/services_view.dart';
-import '../catalog/views/stylists_view.dart';
 
 class AdminShell extends StatefulWidget {
-  const AdminShell({super.key});
+  const AdminShell({super.key, required this.tab, required this.child});
+
+  final int tab;
+  final Widget child;
 
   @override
   State<AdminShell> createState() => _AdminShellState();
 }
 
 class _AdminShellState extends State<AdminShell> {
-  int tab = 0;
-
   @override
   void initState() {
     super.initState();
@@ -29,36 +28,43 @@ class _AdminShellState extends State<AdminShell> {
     });
   }
 
-  Widget _page() {
-    if (tab == 1) return const StylistsView();
-    if (tab == 2) return const ServicesView();
-    return const BookingsView();
+  void _open(int i) {
+    if (i == widget.tab) return;
+    final name = switch (i) {
+      1 => Routes.stylists,
+      2 => Routes.services,
+      _ => Routes.home,
+    };
+    Navigator.pushReplacementNamed(context, name);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Admin'),
-        actions: [
-          TextButton(
-            onPressed: () {
-              context.read<AuthService>().logout();
-              Navigator.pushReplacementNamed(context, Routes.login);
-            },
-            child: const Text('log out'),
-          ),
-          const SizedBox(width: 8),
-        ],
+        primary: false,
+        centerTitle: false,
+        titleSpacing: 16,
+        title: Row(
+          children: [
+            const Text('Admin'),
+            const Spacer(),
+            TextButton(
+              onPressed: () {
+                context.read<AuthService>().logout();
+                Navigator.pushReplacementNamed(context, Routes.login);
+              },
+              child: const Text('log out'),
+            ),
+          ],
+        ),
       ),
       body: Row(
         children: [
           NavigationRail(
-            selectedIndex: tab,
+            selectedIndex: widget.tab,
             labelType: NavigationRailLabelType.all,
-            onDestinationSelected: (i) {
-              setState(() => tab = i);
-            },
+            onDestinationSelected: _open,
             destinations: const [
               NavigationRailDestination(
                 icon: Icon(Icons.calendar_today),
@@ -75,7 +81,7 @@ class _AdminShellState extends State<AdminShell> {
             ],
           ),
           const VerticalDivider(width: 1),
-          Expanded(child: PageBody(child: _page())),
+          Expanded(child: PageBody(child: widget.child)),
         ],
       ),
     );

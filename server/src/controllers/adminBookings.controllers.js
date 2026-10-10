@@ -22,7 +22,7 @@ export async function createBooking(req, res) {
   if (!stylistId || !serviceId || !customerName || !start) {
     return ApiResponse.badRequest(
       res,
-      'need stylistId, serviceId, customerName, and slot on :00/:30 UTC',
+      'missing values',
     );
   }
 

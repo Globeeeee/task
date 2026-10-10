@@ -8,9 +8,6 @@ async function login(req, res) {
   if (!email || !password) {
     return res.status(400).json({ success: false, message: 'email and password required' });
   }
-  if (!apiKey) {
-    return res.status(500).json({ success: false, message: 'FIREBASE_API_KEY missing in server .env' });
-  }
 
   try {
     const url =

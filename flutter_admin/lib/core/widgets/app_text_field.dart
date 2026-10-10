@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class AppTextField extends StatelessWidget {
+class AppTextField extends StatefulWidget {
   const AppTextField({
     super.key,
     required this.controller,
@@ -15,14 +15,29 @@ class AppTextField extends StatelessWidget {
   final ValueChanged<String>? onSubmit;
 
   @override
+  State<AppTextField> createState() => _AppTextFieldState();
+}
+
+class _AppTextFieldState extends State<AppTextField> {
+  late bool hide = widget.obscure;
+
+  @override
   Widget build(BuildContext context) {
     return TextField(
-      controller: controller,
-      obscureText: obscure,
-      onSubmitted: onSubmit,
+      controller: widget.controller,
+      obscureText: hide,
+      onSubmitted: widget.onSubmit,
+      cursorWidth: 1.5,
       decoration: InputDecoration(
-        labelText: label,
+        labelText: widget.label,
         border: const OutlineInputBorder(),
+        suffixIcon: widget.obscure
+            ? IconButton(
+                splashRadius: 20,
+                onPressed: () => setState(() => hide = !hide),
+                icon: Icon(hide ? Icons.visibility_off : Icons.visibility),
+              )
+            : null,
       ),
     );
   }
