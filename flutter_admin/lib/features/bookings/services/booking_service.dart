@@ -28,6 +28,26 @@ class BookingService {
         .toList();
   }
 
+  Future<void> create({
+    required String customerName,
+    required String stylistId,
+    required String serviceId,
+    required String slotStart,
+  }) async {
+    final res = await api.post(
+      '/bookings',
+      body: {
+        'customerName': customerName,
+        'stylistId': stylistId,
+        'serviceId': serviceId,
+        'slotStart': slotStart,
+      },
+    );
+    if (res.statusCode != 201) {
+      throw Exception(res.data['message'] ?? 'booking failed');
+    }
+  }
+
   Future<void> setStatus(String id, String status) async {
     final res = await api.patch(
       '/admin/bookings/$id/status',

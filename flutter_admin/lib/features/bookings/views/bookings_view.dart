@@ -3,9 +3,12 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import '../../../core/utils/error_message.dart';
 import '../../../core/widgets/error_text.dart';
+import '../../catalog/services/services_api.dart';
+import '../../catalog/services/stylist_api.dart';
 import '../models/booking.dart';
 import '../services/booking_service.dart';
 import '../widgets/booking_tile.dart';
+import '../widgets/create_booking_dialog.dart';
 
 class BookingsView extends StatefulWidget {
   const BookingsView({super.key});
@@ -50,6 +53,34 @@ class _BookingsViewState extends State<BookingsView> {
         error = cleanErr(e);
         loading = false;
       });
+    }
+  }
+
+  Future<void> create() async {
+    try {
+      final stylistApi = context.read<StylistApi>();
+      final servicesApi = context.read<ServicesApi>();
+      final stylists = await stylistApi.list();
+      final services = await servicesApi.list();
+      if (!mounted) return;
+      if (stylists.isEmpty || services.isEmpty) {
+        _toast('add a stylist and a service first');
+        return;
+      }
+      final result = await showDialog<CreateBookingResult>(
+        context: context,
+        builder: (_) => CreateBookingDialog(stylists: stylists, services: services),
+      );
+      if (result == null || !mounted) return;
+      await api.create(
+        customerName: result.customerName,
+        stylistId: result.stylistId,
+        serviceId: result.serviceId,
+        slotStart: result.slotStart,
+      );
+      await load();
+    } catch (e) {
+      if (mounted) _toast(cleanErr(e));
     }
   }
 
@@ -109,6 +140,8 @@ class _BookingsViewState extends State<BookingsView> {
                       },
               ),
               IconButton(onPressed: loading ? null : load, icon: const Icon(Icons.refresh)),
+              const SizedBox(width: 8),
+              FilledButton(onPressed: loading ? null : create, child: const Text('Add')),
             ],
           ),
         ),

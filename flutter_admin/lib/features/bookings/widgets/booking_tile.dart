@@ -22,26 +22,29 @@ class BookingTile extends StatelessWidget {
 
     return Card(
       margin: EdgeInsets.only(bottom: 8.h),
-      child: ListTile(
-        title: Text(
-          '${b.customerName} - ${b.serviceName}',
-          style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.w600),
-        ),
-        subtitle: Text(
-          '${b.stylistName}\n${b.slotStart}\n${b.status}',
-          style: TextStyle(fontSize: 13.sp),
-        ),
-        isThreeLine: true,
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(16.w, 12.h, 8.w, 4.h),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (b.pending) ...[
-              TextButton(onPressed: onConfirm, child: const Text('Confirm')),
-              TextButton(onPressed: onCancel, child: const Text('Cancel')),
-            ],
-            IconButton(
-              onPressed: onDelete,
-              icon: const Icon(Icons.delete),
+            Text(
+              '${b.customerName} - ${b.serviceName}',
+              style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.w600),
+            ),
+            SizedBox(height: 4.h),
+            Text(
+              '${b.stylistName}\n${b.slotStart}\n${b.status}',
+              style: TextStyle(fontSize: 13.sp),
+            ),
+            Row(
+              children: [
+                if (b.pending) ...[
+                  TextButton(onPressed: onConfirm, child: const Text('Confirm')),
+                  TextButton(onPressed: onCancel, child: const Text('Cancel')),
+                ],
+                const Spacer(),
+                IconButton(onPressed: onDelete, icon: const Icon(Icons.delete)),
+              ],
             ),
           ],
         ),

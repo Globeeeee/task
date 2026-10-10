@@ -1,4 +1,7 @@
 import Firebase from '../../config/firebase.config.js';
+import StylistsService from './stylists.services.js';
+import ServicesService from './services.services.js';
+import { normalizeSlot } from '../utils/slot.utils.js';
 
 const { db } = Firebase;
 const bookingsCol = () => db.collection('bookings');
@@ -28,6 +31,40 @@ async function listBookings(status) {
   snap.forEach((d) => list.push({ id: d.id, ...d.data() }));
   list.sort((a, b) => (a.slotStart > b.slotStart ? 1 : -1));
   return list;
+}
+
+async function createBooking({ stylistId, serviceId, customerName, slotStart, customerId }) {
+  const name = (customerName || '').trim();
+  const start = normalizeSlot(slotStart);
+
+  if (!stylistId || !serviceId || !name || !start) {
+    throw httpError(
+      'need stylistId, serviceId, customerName, and slot on :00/:30 UTC',
+      400,
+    );
+  }
+
+  const stylist = await StylistsService.getStylistById(stylistId);
+  const service = await ServicesService.getServiceById(serviceId);
+  if (!stylist) throw httpError('stylist not found', 400);
+  if (!service) throw httpError('service not found', 400);
+
+  const end = new Date(start.getTime() + 30 * 60 * 1000);
+  const now = new Date().toISOString();
+
+  return placeBooking({
+    customerId,
+    customerName: name,
+    serviceId: service.id,
+    serviceName: service.name,
+    stylistId: stylist.id,
+    stylistName: stylist.name,
+    slotStart: start.toISOString(),
+    slotEnd: end.toISOString(),
+    status: 'pending',
+    createdAt: now,
+    updatedAt: now,
+  });
 }
 
 async function placeBooking(booking) {
@@ -114,6 +151,7 @@ async function clearBookings() {
 
 export default {
   listBookings,
+  createBooking,
   placeBooking,
   changeStatus,
   deleteBooking,
