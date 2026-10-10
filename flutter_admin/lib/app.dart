@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
+
 import 'core/network/api_client.dart';
 import 'features/auth/services/auth_service.dart';
 import 'features/auth/views/login_view.dart';
@@ -38,10 +39,7 @@ class _AdminAppState extends State<AdminApp> {
         builder: (_, child) => child!,
         child: MaterialApp(
           title: 'admin',
-          theme: ThemeData(
-            primarySwatch: Colors.teal,
-            useMaterial3: true,
-          ),
+          theme: ThemeData(primarySwatch: Colors.teal, useMaterial3: true),
           initialRoute: Routes.login,
           routes: routes,
           onUnknownRoute: (_) =>
