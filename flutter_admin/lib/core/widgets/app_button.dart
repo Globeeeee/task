@@ -6,30 +6,30 @@ class AppButton extends StatelessWidget {
     super.key,
     required this.label,
     required this.onPressed,
-    this.busy = false,
+    this.loading = false,
     this.outlined = false,
   });
 
   final String label;
   final VoidCallback? onPressed;
-  final bool busy;
+  final bool loading;
   final bool outlined;
 
   @override
   Widget build(BuildContext context) {
-    final child = Text(busy ? 'wait...' : label);
+    final child = Text(loading ? '...' : label);
 
     if (outlined) {
       return OutlinedButton(
-        onPressed: busy ? null : onPressed,
+        onPressed: loading ? null : onPressed,
         child: child,
       );
     }
 
     return SizedBox(
-      height: 46.h,
-      child: FilledButton(
-        onPressed: busy ? null : onPressed,
+      height: 44.h,
+      child: ElevatedButton(
+        onPressed: loading ? null : onPressed,
         child: child,
       ),
     );

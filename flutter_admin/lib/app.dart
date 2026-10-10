@@ -17,7 +17,7 @@ class AdminApp extends StatefulWidget {
 }
 
 class _AdminAppState extends State<AdminApp> {
-  late final api = ApiClient();
+  final api = ApiClient();
   late final auth = AuthService(api);
   late final bookings = BookingService(api);
   late final stylists = StylistApi(api);
@@ -35,20 +35,17 @@ class _AdminAppState extends State<AdminApp> {
       ],
       child: ScreenUtilInit(
         designSize: const Size(1440, 900),
-        minTextAdapt: true,
-        builder: (context, child) => child!,
+        builder: (_, child) => child!,
         child: MaterialApp(
-          title: 'Admin Panel',
-          debugShowCheckedModeBanner: false,
+          title: 'admin',
           theme: ThemeData(
-            colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
+            primarySwatch: Colors.teal,
             useMaterial3: true,
           ),
           initialRoute: Routes.login,
           routes: routes,
-          onUnknownRoute: (_) => MaterialPageRoute(
-            builder: (_) => const LoginView(),
-          ),
+          onUnknownRoute: (_) =>
+              MaterialPageRoute(builder: (_) => const LoginView()),
         ),
       ),
     );

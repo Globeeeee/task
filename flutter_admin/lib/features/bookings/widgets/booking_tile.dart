@@ -23,37 +23,25 @@ class BookingTile extends StatelessWidget {
     return Card(
       margin: EdgeInsets.only(bottom: 8.h),
       child: ListTile(
-        contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
         title: Text(
-          '${b.customerName} — ${b.serviceName}',
+          '${b.customerName} - ${b.serviceName}',
           style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.w600),
         ),
         subtitle: Text(
-          'stylist: ${b.stylistName}\n'
-          'time: ${b.slotStart}\n'
-          'status: ${b.status}',
-          style: TextStyle(fontSize: 13.sp, height: 1.35),
+          '${b.stylistName}\n${b.slotStart}\n${b.status}',
+          style: TextStyle(fontSize: 13.sp),
         ),
         isThreeLine: true,
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             if (b.pending) ...[
-              FilledButton(
-                onPressed: onConfirm,
-                child: const Text('Confirm'),
-              ),
-              SizedBox(width: 8.w),
-              OutlinedButton(
-                onPressed: onCancel,
-                child: const Text('Cancel'),
-              ),
-              SizedBox(width: 8.w),
+              TextButton(onPressed: onConfirm, child: const Text('Confirm')),
+              TextButton(onPressed: onCancel, child: const Text('Cancel')),
             ],
             IconButton(
               onPressed: onDelete,
-              icon: const Icon(Icons.delete_outline),
-              tooltip: 'Delete',
+              icon: const Icon(Icons.delete),
             ),
           ],
         ),

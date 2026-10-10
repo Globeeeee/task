@@ -6,6 +6,7 @@ import '../../../core/widgets/error_text.dart';
 import '../models/item.dart';
 import '../widgets/item_tile.dart';
 
+// shared list for stylists + services (same ui basically)
 class ItemListPage extends StatefulWidget {
   const ItemListPage({
     super.key,
@@ -29,7 +30,7 @@ class ItemListPage extends StatefulWidget {
 class _ItemListPageState extends State<ItemListPage> {
   var items = <Item>[];
   var loading = false;
-  String? err;
+  String? error;
 
   @override
   void initState() {
@@ -40,7 +41,7 @@ class _ItemListPageState extends State<ItemListPage> {
   Future<void> load() async {
     setState(() {
       loading = true;
-      err = null;
+      error = null;
     });
     try {
       final data = await widget.getAll();
@@ -52,7 +53,7 @@ class _ItemListPageState extends State<ItemListPage> {
     } catch (e) {
       if (!mounted) return;
       setState(() {
-        err = cleanErr(e);
+        error = cleanErr(e);
         loading = false;
       });
     }
@@ -63,20 +64,20 @@ class _ItemListPageState extends State<ItemListPage> {
   }
 
   Future<void> _save({Item? old}) async {
-    final ctrl = TextEditingController(text: old?.name ?? '');
+    final con = TextEditingController(text: old?.name ?? '');
     final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(old == null ? 'Add' : 'Edit'),
-        content: AppTextField(controller: ctrl, label: 'Name'),
+        content: AppTextField(controller: con, label: 'Name'),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
-          FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Save')),
+          TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Save')),
         ],
       ),
     );
-    final name = ctrl.text.trim();
-    ctrl.dispose();
+    final name = con.text.trim();
+    con.dispose();
     if (ok != true || name.isEmpty || !mounted) return;
 
     try {
@@ -98,7 +99,7 @@ class _ItemListPageState extends State<ItemListPage> {
         title: Text('Delete ${item.name}?'),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('No')),
-          FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Yes')),
+          TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Yes')),
         ],
       ),
     );
@@ -122,24 +123,25 @@ class _ItemListPageState extends State<ItemListPage> {
               Text(widget.title, style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w600)),
               const Spacer(),
               IconButton(onPressed: loading ? null : load, icon: const Icon(Icons.refresh)),
-              FilledButton(onPressed: () => _save(), child: const Text('Add')),
+              ElevatedButton(onPressed: () => _save(), child: const Text('Add')),
             ],
           ),
         ),
         if (loading) const LinearProgressIndicator(),
-        if (err != null) Padding(padding: EdgeInsets.all(16.w), child: ErrorText(err!)),
+        if (error != null)
+          Padding(padding: EdgeInsets.all(16.w), child: ErrorText(error!)),
         Expanded(
           child: items.isEmpty && !loading
-              ? Center(child: Text('nothing here', style: TextStyle(fontSize: 15.sp)))
+              ? Center(child: Text('empty', style: TextStyle(fontSize: 15.sp)))
               : ListView.builder(
                   padding: EdgeInsets.fromLTRB(24.w, 4.h, 24.w, 24.h),
                   itemCount: items.length,
                   itemBuilder: (_, i) {
-                    final it = items[i];
+                    final item = items[i];
                     return ItemTile(
-                      item: it,
-                      onEdit: () => _save(old: it),
-                      onDelete: () => _remove(it),
+                      item: item,
+                      onEdit: () => _save(old: item),
+                      onDelete: () => _remove(item),
                     );
                   },
                 ),

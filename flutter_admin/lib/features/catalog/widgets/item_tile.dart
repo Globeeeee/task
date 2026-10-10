@@ -16,17 +16,14 @@ class ItemTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: EdgeInsets.only(bottom: 8.h),
-      child: ListTile(
-        title: Text(item.name, style: TextStyle(fontSize: 15.sp)),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            IconButton(onPressed: onEdit, icon: const Icon(Icons.edit)),
-            IconButton(onPressed: onDelete, icon: const Icon(Icons.delete)),
-          ],
-        ),
+    return ListTile(
+      title: Text(item.name, style: TextStyle(fontSize: 15.sp)),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(onPressed: onEdit, icon: const Icon(Icons.edit)),
+          IconButton(onPressed: onDelete, icon: const Icon(Icons.delete)),
+        ],
       ),
     );
   }

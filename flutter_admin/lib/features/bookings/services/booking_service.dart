@@ -1,4 +1,3 @@
-import 'dart:convert';
 import '../../../core/network/api_client.dart';
 import '../models/booking.dart';
 
@@ -7,13 +6,13 @@ class BookingService {
   final ApiClient api;
 
   Future<List<Booking>> list({String? status}) async {
-    Map<String, String>? q;
+    Map<String, dynamic>? query;
     if (status != null && status.isNotEmpty) {
-      q = {'status': status};
+      query = {'status': status};
     }
 
-    final res = await api.get('/admin/bookings', query: q);
-    final data = jsonDecode(res.body);
+    final res = await api.get('/admin/bookings', query: query);
+    final data = res.data;
 
     if (res.statusCode == 401) {
       throw Exception(data['message'] ?? 'missing token');
@@ -32,19 +31,17 @@ class BookingService {
   Future<void> setStatus(String id, String status) async {
     final res = await api.patch(
       '/admin/bookings/$id/status',
-      body: jsonEncode({'status': status}),
+      body: {'status': status},
     );
     if (res.statusCode != 200) {
-      final data = jsonDecode(res.body);
-      throw Exception(data['message'] ?? 'update failed');
+      throw Exception(res.data['message'] ?? 'update failed');
     }
   }
 
   Future<void> remove(String id) async {
     final res = await api.delete('/admin/bookings/$id');
     if (res.statusCode != 200) {
-      final data = jsonDecode(res.body);
-      throw Exception(data['message'] ?? 'delete failed');
+      throw Exception(res.data['message'] ?? 'delete failed');
     }
   }
 }

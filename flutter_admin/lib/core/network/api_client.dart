@@ -1,37 +1,41 @@
+import 'package:dio/dio.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:http/http.dart' as http;
 
 class ApiClient {
   ApiClient({String? baseUrl})
-      : baseUrl = baseUrl ?? dotenv.env['BASE_URL'] ?? '';
+      : baseUrl = baseUrl ?? dotenv.env['BASE_URL'] ?? '' {
+    dio = Dio(
+      BaseOptions(
+        baseUrl: this.baseUrl,
+        headers: {'Content-Type': 'application/json'},
+        validateStatus: (_) => true,
+      ),
+    );
+  }
 
   final String baseUrl;
+  late final Dio dio;
   String? token;
 
-  Map<String, String> _headers({bool withAuth = true}) {
-    final h = <String, String>{'Content-Type': 'application/json'};
-    if (withAuth && token != null) h['Authorization'] = 'Bearer $token';
-    return h;
+  Options _headers({bool auth = true}) {
+    final headers = <String, dynamic>{};
+    if (auth && token != null) {
+      headers['Authorization'] = 'Bearer $token';
+    }
+    return Options(headers: headers);
   }
 
-  Uri _url(String path, [Map<String, String>? q]) =>
-      Uri.parse('$baseUrl$path').replace(queryParameters: q);
+  Future<Response> post(String path, {Object? body, bool auth = true}) =>
+      dio.post(path, data: body, options: _headers(auth: auth));
 
-  Future<http.Response> post(String path, {Object? body, bool auth = true}) {
-    return http.post(_url(path), headers: _headers(withAuth: auth), body: body);
-  }
+  Future<Response> get(String path, {Map<String, dynamic>? query}) =>
+      dio.get(path, queryParameters: query, options: _headers());
 
-  Future<http.Response> get(String path, {Map<String, String>? query}) {
-    return http.get(_url(path, query), headers: _headers());
-  }
+  Future<Response> patch(String path, {Object? body}) =>
+      dio.patch(path, data: body, options: _headers());
 
-  Future<http.Response> patch(String path, {Object? body}) {
-    return http.patch(_url(path), headers: _headers(), body: body);
-  }
-
-  Future<http.Response> delete(String path) {
-    return http.delete(_url(path), headers: _headers());
-  }
+  Future<Response> delete(String path) =>
+      dio.delete(path, options: _headers());
 
   void clearToken() => token = null;
 }

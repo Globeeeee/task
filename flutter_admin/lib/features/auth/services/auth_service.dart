@@ -1,4 +1,3 @@
-import 'dart:convert';
 import '../../../core/network/api_client.dart';
 import '../models/admin_user.dart';
 
@@ -10,10 +9,10 @@ class AuthService {
     final res = await api.post(
       '/auth/login',
       auth: false,
-      body: jsonEncode({'email': email, 'password': password}),
+      body: {'email': email, 'password': password},
     );
 
-    final data = jsonDecode(res.body);
+    final data = res.data;
     if (res.statusCode != 200 || data['success'] != true) {
       throw Exception(data['message'] ?? 'login failed');
     }
@@ -23,5 +22,7 @@ class AuthService {
     return user;
   }
 
-  void logout() => api.clearToken();
+  void logout() {
+    api.clearToken();
+  }
 }

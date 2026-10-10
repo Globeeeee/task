@@ -17,11 +17,12 @@ class LoginView extends StatefulWidget {
 }
 
 class _LoginViewState extends State<LoginView> {
+  // hardcoded for now, change later
   final email = TextEditingController(text: 'admin@gmail.com');
   final pass = TextEditingController(text: 'Admin@123');
 
-  bool busy = false;
-  String err = '';
+  bool loading = false;
+  String error = '';
 
   @override
   void dispose() {
@@ -30,10 +31,10 @@ class _LoginViewState extends State<LoginView> {
     super.dispose();
   }
 
-  Future<void> _go() async {
+  Future<void> _login() async {
     setState(() {
-      busy = true;
-      err = '';
+      loading = true;
+      error = '';
     });
 
     try {
@@ -43,8 +44,8 @@ class _LoginViewState extends State<LoginView> {
     } catch (e) {
       if (!mounted) return;
       setState(() {
-        err = cleanErr(e);
-        busy = false;
+        error = cleanErr(e);
+        loading = false;
       });
     }
   }
@@ -65,27 +66,27 @@ class _LoginViewState extends State<LoginView> {
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 28.sp, fontWeight: FontWeight.w700),
               ),
-              SizedBox(height: 6.h),
+              SizedBox(height: 8.h),
               Text(
-                'login to manage the panel',
+                'login to manage stuff',
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 14.sp, color: Colors.grey[700]),
+                style: TextStyle(fontSize: 14.sp, color: Colors.grey),
               ),
-              SizedBox(height: 28.h),
+              SizedBox(height: 30.h),
               AppTextField(controller: email, label: 'Email'),
               SizedBox(height: 12.h),
               AppTextField(
                 controller: pass,
                 label: 'Password',
                 obscure: true,
-                onSubmit: (_) => _go(),
+                onSubmit: (_) => _login(),
               ),
-              if (err.isNotEmpty) ...[
+              if (error.isNotEmpty) ...[
                 SizedBox(height: 10.h),
-                ErrorText(err),
+                ErrorText(error),
               ],
-              SizedBox(height: 18.h),
-              AppButton(label: 'Login', busy: busy, onPressed: _go),
+              SizedBox(height: 20.h),
+              AppButton(label: 'Login', loading: loading, onPressed: _login),
             ],
           ),
         ),

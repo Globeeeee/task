@@ -22,6 +22,7 @@ class _AdminShellState extends State<AdminShell> {
   @override
   void initState() {
     super.initState();
+    // kick back to login if no token
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       if (context.read<ApiClient>().token == null) {
@@ -30,29 +31,26 @@ class _AdminShellState extends State<AdminShell> {
     });
   }
 
+  Widget _page() {
+    if (tab == 1) return const StylistsView();
+    if (tab == 2) return const ServicesView();
+    return const BookingsView();
+  }
+
   @override
   Widget build(BuildContext context) {
-    Widget body;
-    if (tab == 1) {
-      body = const StylistsView();
-    } else if (tab == 2) {
-      body = const ServicesView();
-    } else {
-      body = const BookingsView();
-    }
-
     return Scaffold(
       appBar: AppBar(
-        title: Text('Admin Panel', style: TextStyle(fontSize: 20.sp)),
+        title: Text('Admin', style: TextStyle(fontSize: 20.sp)),
         actions: [
           TextButton(
             onPressed: () {
               context.read<AuthService>().logout();
               Navigator.pushReplacementNamed(context, Routes.login);
             },
-            child: const Text('Logout'),
+            child: const Text('log out'),
           ),
-          SizedBox(width: 12.w),
+          SizedBox(width: 8.w),
         ],
       ),
       body: Row(
@@ -60,27 +58,26 @@ class _AdminShellState extends State<AdminShell> {
           NavigationRail(
             selectedIndex: tab,
             labelType: NavigationRailLabelType.all,
-            onDestinationSelected: (i) => setState(() => tab = i),
+            onDestinationSelected: (i) {
+              setState(() => tab = i);
+            },
             destinations: const [
               NavigationRailDestination(
-                icon: Icon(Icons.calendar_today_outlined),
-                selectedIcon: Icon(Icons.calendar_today),
+                icon: Icon(Icons.calendar_today),
                 label: Text('Bookings'),
               ),
               NavigationRailDestination(
-                icon: Icon(Icons.person_outline),
-                selectedIcon: Icon(Icons.person),
+                icon: Icon(Icons.person),
                 label: Text('Stylists'),
               ),
               NavigationRailDestination(
-                icon: Icon(Icons.cut_outlined),
-                selectedIcon: Icon(Icons.cut),
+                icon: Icon(Icons.cut),
                 label: Text('Services'),
               ),
             ],
           ),
           const VerticalDivider(width: 1),
-          Expanded(child: PageBody(child: body)),
+          Expanded(child: PageBody(child: _page())),
         ],
       ),
     );

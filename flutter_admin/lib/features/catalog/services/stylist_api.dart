@@ -1,4 +1,3 @@
-import 'dart:convert';
 import '../../../core/network/api_client.dart';
 import '../models/item.dart';
 
@@ -8,7 +7,7 @@ class StylistApi {
 
   Future<List<Item>> list() async {
     final res = await api.get('/stylists');
-    final body = jsonDecode(res.body);
+    final body = res.data;
     if (res.statusCode != 200) {
       throw Exception(body['message'] ?? 'couldnt load stylists');
     }
@@ -18,8 +17,8 @@ class StylistApi {
   }
 
   Future<Item> add(String name) async {
-    final res = await api.post('/stylists', body: jsonEncode({'name': name}));
-    final body = jsonDecode(res.body);
+    final res = await api.post('/stylists', body: {'name': name});
+    final body = res.data;
     if (res.statusCode != 200 && res.statusCode != 201) {
       throw Exception(body['message'] ?? 'create failed');
     }
@@ -27,20 +26,17 @@ class StylistApi {
   }
 
   Future<Item> edit(String id, String name) async {
-    final res =
-        await api.patch('/stylists/$id', body: jsonEncode({'name': name}));
-    final body = jsonDecode(res.body);
+    final res = await api.patch('/stylists/$id', body: {'name': name});
     if (res.statusCode != 200) {
-      throw Exception(body['message'] ?? 'update failed');
+      throw Exception(res.data['message'] ?? 'update failed');
     }
-    return Item.fromJson(Map<String, dynamic>.from(body['data']));
+    return Item.fromJson(Map<String, dynamic>.from(res.data['data']));
   }
 
   Future<void> delete(String id) async {
     final res = await api.delete('/stylists/$id');
     if (res.statusCode != 200) {
-      final body = jsonDecode(res.body);
-      throw Exception(body['message'] ?? 'delete failed');
+      throw Exception(res.data['message'] ?? 'delete failed');
     }
   }
 }

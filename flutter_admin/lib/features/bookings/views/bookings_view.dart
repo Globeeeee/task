@@ -18,7 +18,7 @@ class _BookingsViewState extends State<BookingsView> {
   var items = <Booking>[];
   var filter = 'all';
   var loading = false;
-  String? err;
+  String? error;
 
   BookingService get api => context.read<BookingService>();
 
@@ -35,7 +35,7 @@ class _BookingsViewState extends State<BookingsView> {
   Future<void> load() async {
     setState(() {
       loading = true;
-      err = null;
+      error = null;
     });
     try {
       final list = await api.list(status: filter == 'all' ? null : filter);
@@ -47,7 +47,7 @@ class _BookingsViewState extends State<BookingsView> {
     } catch (e) {
       if (!mounted) return;
       setState(() {
-        err = cleanErr(e);
+        error = cleanErr(e);
         loading = false;
       });
     }
@@ -69,7 +69,7 @@ class _BookingsViewState extends State<BookingsView> {
         title: const Text('Delete this booking?'),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('No')),
-          FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Yes')),
+          TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Yes')),
         ],
       ),
     );
@@ -113,10 +113,11 @@ class _BookingsViewState extends State<BookingsView> {
           ),
         ),
         if (loading) const LinearProgressIndicator(),
-        if (err != null) Padding(padding: EdgeInsets.all(16.w), child: ErrorText(err!)),
+        if (error != null)
+          Padding(padding: EdgeInsets.all(16.w), child: ErrorText(error!)),
         Expanded(
           child: items.isEmpty && !loading
-              ? Center(child: Text('nothing here', style: TextStyle(fontSize: 15.sp)))
+              ? Center(child: Text('no bookings', style: TextStyle(fontSize: 15.sp)))
               : ListView.builder(
                   padding: EdgeInsets.fromLTRB(24.w, 4.h, 24.w, 24.h),
                   itemCount: items.length,
